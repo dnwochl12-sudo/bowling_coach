@@ -1,0 +1,11 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "볼링코치",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "papaya-clafoutis-b92ee5.netlify",
+  "start_url": "/",
+  "theme_color": "#ffffff"
+}

@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>볼링 코치</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--card:#fff;--tx:#18202b;--mut:#66707f;--ac:#2b59c3;--ac2:#fff;--ln:#d9dee6;--red:#d1342f;--ok:#1f8a5b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151c;--card:#19212b;--tx:#edf0f5;--mut:#98a2b3;--ac:#6d93ff;--ac2:#0b1020;--ln:#2a3441;--red:#ff6b64;--ok:#4cc38a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10151c;--card:#19212b;--tx:#edf0f5;--mut:#98a2b3;--ac:#6d93ff;--ac2:#0b1020;--ln:#2a3441;--red:#ff6b64;--ok:#4cc38a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-family:"Black Han Sans","Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-weight:400;font-size:30px;margin:0;letter-spacing:.5px}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--ln);border-radius:999px;padding:3px}
+.tab{border:0;background:none;color:var(--mut);font:inherit;font-size:14px;font-weight:600;padding:6px 11px;border-radius:999px;cursor:pointer}
+.tab.on{background:var(--ac);color:var(--ac2)}
+button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.frames{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:18px}
+.fr{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:4px 4px 6px;text-align:center}
+.fr.on{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
+.fn{font-size:11px;color:var(--mut)}
+.mk{display:flex;justify-content:flex-end;gap:2px;margin:2px 0}
+.mk span{min-width:16px;height:20px;border:1px solid var(--ln);text-align:center;font-weight:700;font-size:13px;line-height:18px}
+.mk span.h{color:var(--red)}
+.sc{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;min-height:28px}
+.hint{margin:0 0 10px;color:var(--mut);font-size:14px}
+.pins{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.pin{aspect-ratio:1;border-radius:50%;border:0;background:var(--ac);color:var(--ac2);font:inherit;font-size:20px;font-weight:700;cursor:pointer}
+.pin.hit{background:var(--red);color:#fff}
+.pin.undo{background:var(--card);color:var(--tx);border:1px solid var(--ln);font-size:13px;font-weight:600}
+.pin:disabled{opacity:.25;cursor:default}
+.row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;border:1px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-weight:600;padding:12px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--ac);color:var(--ac2);border-color:var(--ac)}
+.done{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:16px;text-align:center}
+.done p{margin:0 0 4px;font-size:16px}.done b{font-size:32px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat small{color:var(--mut)}
+.tip{background:var(--card);border-left:4px solid var(--ac);border-radius:6px;padding:12px 14px;margin:0 0 16px;font-size:15px}
+h2{font-size:15px;margin:18px 0 8px}
+.bars{display:flex;align-items:flex-end;gap:5px;height:110px;padding-top:16px;border-bottom:1px solid var(--ln)}
+.bar{flex:1;background:var(--ac);border-radius:3px 3px 0 0;position:relative;min-height:2px}
+.bar i{position:absolute;top:-15px;left:0;right:0;text-align:center;font-size:10px;font-style:normal;color:var(--mut)}
+.list{display:flex;flex-direction:column;gap:6px}
+.g{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:8px 12px}
+.g b{font-size:18px;font-variant-numeric:tabular-nums}
+.x{border:0;background:none;color:var(--mut);font-size:18px;cursor:pointer;padding:0 4px}
+.empty{color:var(--mut);text-align:center;padding:40px 8px}
+.pick{display:block;text-align:center;cursor:pointer;margin-bottom:12px}
+.vbox{position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.vbox video{display:block;width:100%;max-height:60vh}
+.vbox canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#vs{width:100%;accent-color:var(--ac)}
+.row.s{margin-top:8px}.row.s .btn{padding:10px 6px;font-size:14px}
+.btn.on{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
+.thumbs{display:flex;gap:8px;margin-top:10px}
+.thumbs button{border:0;padding:0;background:none}
+.thumbs img{width:90px;height:60px;object-fit:cover;border-radius:6px;display:block}
+#ai{white-space:pre-wrap;margin-top:12px}
+.dr{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.dr b{display:block}
+.dr small{color:var(--mut);font-size:13px}
+#lr{display:none}
+#vc.live #lr{display:flex}
+#vc.live #vs,#vc.live [data-v=back],#vc.live [data-v=fwd],#vc.live [data-v=play],#vc.live [data-v=rate]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>볼링 코치</h1>
+    <nav>
+      <button class="tab on" data-t="rec">기록</button>
+      <button class="tab" data-t="stat">내 통계</button>
+      <button class="tab" data-t="vid">영상</button>
+    </nav>
+  </header>
+  <main id="app"></main>
+  <div id='vid' hidden>
+    <div class='row s'><button class='btn' data-v='live'>실시간 카메라</button><label class='btn primary pick' style='margin:0'>카메라로 촬영<input id='vf2' type='file' accept='video/*' capture='environment' hidden></label><label class='btn pick' style='margin:0'>앨범 선택<input id='vf' type='file' accept='video/*' hidden></label></div>
+    <p class='hint' id='vh'>영상을 고르면 한 프레임씩 넘겨보며 선과 각도를 그려볼 수 있어요. 릴리스 같은 장면을 최대 3장 담아 AI 코칭도 받을 수 있어요.</p>
+    <div class='vbox' id='vb' hidden><video id='v' playsinline muted preload='auto'></video><canvas id='cv'></canvas></div>
+    <div id='vc' hidden>
+      <div class='row s' id='lr'><button class='btn' data-v='flip'>카메라 전환</button><button class='btn primary' data-v='rec'>녹화 시작</button></div>
+      <input id='vs' type='range' min='0' max='1000' value='0'>
+      <div class='row s'><button class='btn' data-v='back'>◀ 1프레임</button><button class='btn' data-v='play'>재생</button><button class='btn' data-v='fwd'>1프레임 ▶</button></div>
+      <div class='row s'><button class='btn' data-v='rate'>속도 1x</button><button class='btn on' data-v='line'>선</button><button class='btn' data-v='ang'>각도</button><button class='btn' data-v='clr'>지우기</button></div>
+      <div class='row s'><button class='btn' data-v='cap'>이 장면 담기 (0/3)</button><button class='btn primary' data-v='ai'>AI 코칭</button></div>
+      <div class='thumbs' id='thumbs'></div>
+      <div class='tip' id='ai' hidden></div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+let tab = 'rec', rolls = [], games = [];
+try { games = JSON.parse(localStorage.getItem('bw-games') || '[]'); } catch (e) { games = []; }
+try { rolls = JSON.parse(localStorage.getItem('bw-cur') || '[]'); } catch (e) { rolls = []; }
+if (!Array.isArray(games)) games = [];
+if (!Array.isArray(rolls)) rolls = [];
+
+function persist() {
+  try { localStorage.setItem('bw-games', JSON.stringify(games)); } catch (e) {}
+  try { localStorage.setItem('bw-cur', JSON.stringify(rolls)); } catch (e) {}
+}
+
+function parse(r) {
+  const fr = []; let i = 0;
+  for (let f = 0; f < 9 && i < r.length; f++) {
+    if (r[i] === 10) { fr.push([10]); i++; }
+    else if (i + 1 < r.length) { fr.push([r[i], r[i + 1]]); i += 2; }
+    else { fr.push([r[i]]); i++; }
+  }
+  return { fr, t: fr.length === 9 ? r.slice(i) : [] };
+}
+function isDone(r) {
+  const t = parse(r).t;
+  if (t.length === 3) return true;
+  return t.length === 2 && t[0] !== 10 && t[0] + t[1] < 10;
+}
+function curFrame(r) {
+  const { fr } = parse(r);
+  if (!fr.length) return 1;
+  const last = fr[fr.length - 1], open = last.length === 1 && last[0] !== 10;
+  if (fr.length === 9 && !open) return 10;
+  return open ? fr.length : fr.length + 1;
+}
+function remain(r) {
+  const { fr, t } = parse(r);
+  const last = fr[fr.length - 1];
+  const open = last && last.length === 1 && last[0] !== 10;
+  if (fr.length < 9 || open) return open ? 10 - last[0] : 10;
+  if (t.length === 0) return 10;
+  if (t.length === 1) return t[0] === 10 ? 10 : 10 - t[0];
+  if (t[0] === 10) return t[1] === 10 ? 10 : 10 - t[1];
+  return 10;
+}
+function scores(r) {
+  const out = []; let i = 0, tot = 0;
+  for (let f = 0; f < 10; f++) {
+    if (i >= r.length) { out.push(null); continue; }
+    let s = null;
+    if (r[i] === 10) { if (i + 2 < r.length) s = 10 + r[i + 1] + r[i + 2]; i += 1; }
+    else if (i + 1 < r.length) {
+      if (r[i] + r[i + 1] === 10) { if (i + 2 < r.length) s = 10 + r[i + 2]; }
+      else s = r[i] + r[i + 1];
+      i += 2;
+    } else i += 1;
+    if (s !== null && tot !== null) { tot += s; out.push(tot); } else { tot = null; out.push(null); }
+  }
+  return out;
+}
+function marks(r) {
+  const m = []; let i = 0;
+  const d = x => x === 0 ? '-' : x;
+  for (let f = 0; f < 9; f++) {
+    if (i >= r.length) { m.push(['', '']); continue; }
+    if (r[i] === 10) { m.push(['', 'X']); i++; }
+    else {
+      const a = r[i], b = r[i + 1];
+      m.push([d(a), b === undefined ? '' : (a + b === 10 ? '/' : d(b))]);
+      i += b === undefined ? 1 : 2;
+    }
+  }
+  const t = r.slice(i), mk = [];
+  t.forEach((x, k) => {
+    let c;
+    if (x === 10) c = 'X';
+    else if (k === 1 && t[0] !== 10 && t[0] + x === 10) c = '/';
+    else if (k === 2 && t[0] === 10 && t[1] !== 10 && t[1] + x === 10) c = '/';
+    else c = d(x);
+    mk.push(c);
+  });
+  while (mk.length < 3) mk.push('');
+  m.push(mk);
+  return m;
+}
+function analyze(r) {
+  const res = { st: 0, sp: 0, op: 0, fb: 0, n: 0 }; let i = 0;
+  for (let f = 0; f < 10; f++) {
+    const a = r[i], b = r[i + 1];
+    if (a === undefined) break;
+    res.n++; res.fb += a;
+    if (a === 10) { res.st++; i++; }
+    else if (b !== undefined && a + b === 10) { res.sp++; i += 2; }
+    else { res.op++; i += 2; }
+  }
+  return res;
+}
+
+function recView() {
+  const m = marks(rolls), sc = scores(rolls), done = isDone(rolls), cf = curFrame(rolls), rem = remain(rolls);
+  let h = '<section class="frames">';
+  for (let f = 0; f < 10; f++) {
+    const mk = m[f].map(c => `<span class="${c === 'X' || c === '/' ? 'h' : ''}">${c}</span>`).join('');
+    h += `<div class="fr${!done && cf === f + 1 ? ' on' : ''}"><div class="fn">${f + 1}</div><div class="mk">${mk}</div><div class="sc">${sc[f] ?? ''}</div></div>`;
+  }
+  h += '</section>';
+  if (done) {
+    h += `<section class="done"><p>게임 종료</p><p><b>${sc[9]}</b>점</p></section>
+    <div class="row"><button class="btn" data-a="undo">마지막 투구 취소</button><button class="btn primary" data-a="save">게임 저장</button></div>`;
+  } else {
+    h += `<p class="hint">${cf}프레임 · 쓰러뜨린 핀 수를 눌러주세요 (남은 핀 ${rem}개)</p><div class="pins">`;
+    for (let n = 0; n <= 10; n++) {
+      const hit = n === rem && n > 0;
+      h += `<button class="pin${hit ? ' hit' : ''}" data-n="${n}" ${n > rem ? 'disabled' : ''}>${hit ? (rem === 10 ? 'X' : '/') : n}</button>`;
+    }
+    h += `<button class="pin undo" data-a="undo" ${rolls.length ? '' : 'disabled'}>취소</button></div>`;
+    if (rolls.length) h += '<div class="row"><button class="btn" data-a="new">이 게임 지우고 새로 시작</button></div>';
+  }
+  return h;
+}
+
+function tip(spr, str, a) {
+  if (a.sp + a.op >= 5 && spr < 50) return '스페어 성공률이 낮아요. 남은 핀 위치별로 서 있을 자리와 겨냥 지점을 정해두고, 10번 핀부터 집중해서 연습해보세요.';
+  if (str < 25) return '스트라이크율을 올리려면 첫 공이 포켓에 들어가야 해요. 화살표 하나를 타깃으로 정하고 같은 지점으로 굴리는 연습을 먼저 해보세요.';
+  return '좋은 흐름이에요. 이제 스플릿 처리와 레인 상태에 따른 라인 조정을 연습해볼 차례예요.';
+}
+
+const DR = {
+  sp: [
+    ['10번 핀 스페어 연습', '10번 핀만 세워두고 10번 던져요. 왼쪽 끝에서 대각선으로 겨냥하고 성공 횟수를 기록해요.', '3세트'],
+    ['3-6-9 스페어 시스템', '남은 핀 위치에 따라 서는 자리를 3·6·9칸씩 옮겨 같은 타깃으로 던지는 방법을 익혀요.', '핀 위치별 5회']
+  ],
+  st: [
+    ['타깃 화살표 고정 연습', '화살표 하나를 정해 10번 연속 같은 지점으로 굴려요. 포켓에 들어간 횟수를 세요.', '3세트'],
+    ['포켓 확인 게임', '매 프레임 첫 공이 포켓(1-3번 핀 사이, 오른손 기준)에 닿았는지 기록해요.', '1게임']
+  ],
+  fb: [
+    ['릴리스 일정하게', '같은 자리에 서서 팔로스루를 눈높이까지 3초 유지하는 연습을 해요. 영상 탭으로 찍어 확인해보세요.', '10회']
+  ]
+};
+function drillView(spr, str, a) {
+  const ks = [];
+  if (a.sp + a.op >= 5 && spr < 60) ks.push('sp');
+  if (str < 30) ks.push('st');
+  if (!ks.length) ks.push('fb');
+  const items = ks.flatMap(k => DR[k]).slice(0, 3);
+  return '<h2>추천 연습</h2>' + items.map(d => `<div class='dr'><b>${d[0]}</b><small>${d[1]} · ${d[2]}</small></div>`).join('');
+}
+function statView() {
+  if (!games.length) return '<p class="empty">저장된 게임이 없어요.<br>기록 탭에서 한 게임을 끝까지 입력하고 저장해보세요.</p>';
+  const a = { st: 0, sp: 0, op: 0, fb: 0, n: 0 };
+  games.forEach(g => { const x = analyze(g.r); for (const k in a) a[k] += x[k]; });
+  const sc = games.map(g => g.s), avg = sc.reduce((p, c) => p + c, 0) / sc.length, hi = Math.max(...sc);
+  const spr = a.sp + a.op ? a.sp / (a.sp + a.op) * 100 : 0, str = a.n ? a.st / a.n * 100 : 0, fb = a.n ? a.fb / a.n : 0;
+  const recent = games.slice(-10);
+  let h = `<p class="tip">${tip(spr, str, a)}</p>
+  <div class="grid2">
+    <div class="stat"><b>${Math.round(avg)}</b><small>평균 점수 (${games.length}게임)</small></div>
+    <div class="stat"><b>${hi}</b><small>최고 점수</small></div>
+    <div class="stat"><b>${Math.round(str)}%</b><small>스트라이크율</small></div>
+    <div class="stat"><b>${Math.round(spr)}%</b><small>스페어 성공률</small></div>
+    <div class="stat"><b>${fb.toFixed(1)}</b><small>첫 공 평균 핀</small></div>
+    <div class="stat"><b>${a.op}</b><small>오픈 프레임</small></div>
+  </div>
+  ${drillView(spr, str, a)}<h2>최근 점수</h2><div class="bars">`;
+  recent.forEach(g => { h += `<div class="bar" style="height:${Math.max(g.s / 3, 1)}%"><i>${g.s}</i></div>`; });
+  h += '</div><h2>게임 기록</h2><div class="list">';
+  games.map((g, i) => ({ g, i })).reverse().forEach(({ g, i }) => {
+    const dt = new Date(g.d).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' });
+    h += `<div class="g"><span>${dt}</span><b>${g.s}점</b><button class="x" data-a="del" data-i="${i}" aria-label="삭제">×</button></div>`;
+  });
+  return h + '</div>';
+}
+
+function render() {
+  $('#app').hidden = tab === 'vid'; $('#vid').hidden = tab !== 'vid';
+  if (tab !== 'vid') {
+    $('#app').innerHTML = tab === 'rec' ? recView() : statView();
+    if (stream) {
+      if (mr && mr.state === 'recording') { mr.onstop = null; mr.stop(); }
+      stopStream(); V.srcObject = null; $('#vb').hidden = true; $('#vc').hidden = true;
+    }
+  } else setTimeout(fit, 0);
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b || b.disabled) return;
+  if (b.dataset.t) { tab = b.dataset.t; render(); return; }
+  if (b.dataset.n !== undefined) rolls.push(+b.dataset.n);
+  else if (b.dataset.a === 'undo') rolls.pop();
+  else if (b.dataset.a === 'new') rolls = [];
+  else if (b.dataset.a === 'save') { games.push({ d: Date.now(), r: rolls.slice(), s: scores(rolls)[9] }); rolls = []; tab = 'stat'; }
+  else if (b.dataset.a === 'del') games.splice(+b.dataset.i, 1);
+  else return;
+  persist();
+  render();
+});
+
+/* 영상 분석 */
+const V = $('#v'), C = $('#cv'), cx = C.getContext('2d');
+let tool = 'line', pts = [], shapes = [], caps = [], vurl = null, ri = 0;
+const rates = [1, 0.5, 0.25];
+function fit() { C.width = V.clientWidth; C.height = V.clientHeight; draw(); }
+function pxp(p) { return [p[0] * C.width, p[1] * C.height]; }
+function draw() {
+  cx.clearRect(0, 0, C.width, C.height);
+  cx.lineWidth = 3; cx.strokeStyle = '#ffd23f'; cx.fillStyle = '#ffd23f'; cx.font = 'bold 15px sans-serif';
+  const dot = p => { cx.beginPath(); cx.arc(p[0], p[1], 5, 0, 7); cx.fill(); };
+  shapes.forEach(s => {
+    const q = s.p.map(pxp);
+    cx.beginPath(); q.forEach((p, i) => i ? cx.lineTo(p[0], p[1]) : cx.moveTo(p[0], p[1])); cx.stroke(); q.forEach(dot);
+    let txt;
+    if (s.t === 'line') {
+      txt = Math.round(Math.atan2(Math.abs(q[1][0] - q[0][0]), Math.abs(q[1][1] - q[0][1])) * 180 / Math.PI) + '° (수직 기준)';
+    } else {
+      const a = Math.atan2(q[0][1] - q[1][1], q[0][0] - q[1][0]), b = Math.atan2(q[2][1] - q[1][1], q[2][0] - q[1][0]);
+      let d = Math.abs(a - b); if (d > Math.PI) d = 2 * Math.PI - d;
+      txt = Math.round(d * 180 / Math.PI) + '°';
+    }
+    cx.shadowColor = '#000'; cx.shadowBlur = 4; cx.fillText(txt, q[1][0] + 8, q[1][1] - 8); cx.shadowBlur = 0;
+  });
+  pts.map(pxp).forEach(dot);
+}
+C.addEventListener('pointerdown', e => {
+  const r = C.getBoundingClientRect();
+  pts.push([(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]);
+  if (pts.length === (tool === 'line' ? 2 : 3)) { shapes.push({ t: tool, p: pts }); pts = []; }
+  draw();
+});
+$('#vf').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  if (vurl) URL.revokeObjectURL(vurl);
+  stopStream(); V.srcObject = null; $('#vc').classList.remove('live');
+  vurl = URL.createObjectURL(f); V.src = vurl;
+  shapes = []; pts = []; caps = []; thumbs();
+  $('#vb').hidden = false; $('#vc').hidden = false; $('#ai').hidden = true;
+});
+$('#vf2').addEventListener('change', e => { $('#vf').files = e.target.files; $('#vf').dispatchEvent(new Event('change')); });
+V.addEventListener('loadedmetadata', fit);
+V.addEventListener('error', () => { $('#vh').textContent = '영상을 불러오지 못했어요. mp4 같은 다른 파일로 다시 시도해보세요.'; });
+V.addEventListener('timeupdate', () => { if (V.duration) $('#vs').value = V.currentTime / V.duration * 1000; });
+V.addEventListener('play', () => { $('[data-v=play]').textContent = '일시정지'; });
+V.addEventListener('pause', () => { $('[data-v=play]').textContent = '재생'; });
+window.addEventListener('resize', fit);
+$('#vs').addEventListener('input', e => { V.pause(); V.currentTime = e.target.value / 1000 * V.duration; });
+function thumbs() {
+  $('#thumbs').innerHTML = caps.map((c, i) => `<button data-v='rm' data-i='${i}' aria-label='삭제'><img src='${c.u}' alt=''></button>`).join('');
+  $('[data-v=cap]').textContent = `이 장면 담기 (${caps.length}/3)`;
+}
+function cap() {
+  if (caps.length >= 3 || !V.videoWidth) return;
+  const k = Math.min(1, 640 / V.videoWidth), c = document.createElement('canvas');
+  c.width = Math.round(V.videoWidth * k); c.height = Math.round(V.videoHeight * k);
+  c.getContext('2d').drawImage(V, 0, 0, c.width, c.height);
+  c.toBlob(bl => { if (!bl) return; caps.push({ bl, u: URL.createObjectURL(bl), t: V.currentTime }); thumbs(); }, 'image/jpeg', 0.8);
+}
+async function askAI() {
+  const o = $('#ai'); o.hidden = false;
+  if (!caps.length) { o.textContent = '먼저 분석할 장면을 1~3장 담아주세요.'; return; }
+  let sm = null;
+  try { sm = window.claude && await claude.use('sample'); } catch (e) {}
+  if (!sm) { o.textContent = '이 화면에서는 AI 코칭을 쓸 수 없어요. 선과 각도 도구로 직접 확인해보세요.'; return; }
+  o.textContent = '분석 중...';
+  try {
+    const imgs = caps.slice().sort((a, b) => a.t - b.t).map(c => c.bl);
+    const r = await sm('볼링 투구 영상에서 시간순으로 뽑은 장면 ' + imgs.length + '장이에요. 볼링 코치로서 사진에 실제로 보이는 것만 근거로 자세를 분석해주세요. 스탠스와 균형, 팔 스윙과 릴리스 위치, 팔로스루를 살펴보고, 잘한 점 1개, 고칠 점 2개, 연습 드릴 1개를 한국어로 8문장 이내로 알려주세요. 사진만으로 확실하지 않은 건 추측이라고 표시하고, 마크다운 기호는 쓰지 마세요.', { images: imgs, onText: ({ text }) => { o.textContent = text; } });
+    o.textContent = r.text;
+  } catch (e) {
+    o.textContent = e && e.code === 'not_granted' ? 'AI 사용을 허용해야 코칭을 받을 수 있어요.' : '분석에 실패했어요. 잠시 후 다시 시도해주세요.';
+  }
+}
+let stream = null, facing = 'environment', mr = null, chunks = [];
+function stopStream() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+async function startLive() {
+  stopStream();
+  const h = $('#vh');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { h.textContent = '이 화면에서는 실시간 카메라를 쓸 수 없어요. 카메라로 촬영 버튼으로 녹화하면 바로 분석할 수 있어요.'; return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing } }, audio: false });
+  } catch (e) { h.textContent = '이 화면에서는 실시간 카메라가 막혀 있어요. 카메라로 촬영 버튼으로 녹화하면 바로 분석할 수 있어요.'; return; }
+  if (vurl) { URL.revokeObjectURL(vurl); vurl = null; }
+  V.removeAttribute('src'); V.srcObject = stream; V.play().catch(() => {});
+  shapes = []; pts = []; caps = []; thumbs();
+  $('#vb').hidden = false; $('#vc').hidden = false; $('#vc').classList.add('live'); $('#ai').hidden = true;
+  $('[data-v=rec]').textContent = '녹화 시작';
+  h.textContent = '실시간 화면에 선을 그려 자세 기준선으로 쓸 수 있어요. 녹화하면 끝난 뒤 슬로우로 돌려볼 수 있어요.';
+}
+function toggleRec(b) {
+  if (mr && mr.state === 'recording') { mr.stop(); return; }
+  if (!stream || !window.MediaRecorder) { $('#vh').textContent = '이 환경에서는 녹화를 쓸 수 없어요.'; return; }
+  chunks = [];
+  try { mr = new MediaRecorder(stream); } catch (e) { $('#vh').textContent = '이 환경에서는 녹화를 쓸 수 없어요.'; return; }
+  mr.ondataavailable = ev => { if (ev.data.size) chunks.push(ev.data); };
+  mr.onstop = () => {
+    const bl = new Blob(chunks, { type: mr.mimeType || 'video/mp4' });
+    stopStream(); V.srcObject = null;
+    if (vurl) URL.revokeObjectURL(vurl);
+    vurl = URL.createObjectURL(bl); V.src = vurl;
+    $('#vc').classList.remove('live'); b.textContent = '녹화 시작';
+    $('#vh').textContent = '녹화 완료. 슬로우와 프레임 단위로 돌려보며 분석해보세요.';
+  };
+  mr.start(); b.textContent = '녹화 끝내기';
+}
+V.addEventListener('loadedmetadata', () => {
+  if (V.duration === Infinity) {
+    V.currentTime = 1e101;
+    V.addEventListener('timeupdate', function f() { V.removeEventListener('timeupdate', f); V.currentTime = 0; });
+  }
+});
+$('#vid').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !b.dataset.v) return;
+  const a = b.dataset.v;
+  if (a === 'back' || a === 'fwd') { V.pause(); V.currentTime = Math.max(0, V.currentTime + (a === 'fwd' ? 1 : -1) / 30); }
+  else if (a === 'play') { if (V.paused) V.play().catch(() => {}); else V.pause(); }
+  else if (a === 'rate') { ri = (ri + 1) % 3; V.playbackRate = rates[ri]; b.textContent = '속도 ' + rates[ri] + 'x'; }
+  else if (a === 'line' || a === 'ang') { tool = a; pts = []; document.querySelectorAll('[data-v=line],[data-v=ang]').forEach(x => x.classList.toggle('on', x.dataset.v === tool)); draw(); }
+  else if (a === 'clr') { shapes = []; pts = []; draw(); }
+  else if (a === 'cap') cap();
+  else if (a === 'rm') { caps.splice(+b.dataset.i, 1); thumbs(); }
+  else if (a === 'ai') askAI();
+  else if (a === 'live') startLive();
+  else if (a === 'flip') { facing = facing === 'environment' ? 'user' : 'environment'; startLive(); }
+  else if (a === 'rec') toggleRec(b);
+});
+render();
+</script>
+</body>
+</html>
